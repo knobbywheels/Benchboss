@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --primary: #27AE60;
+  --destructive: #C0392B;
+  --accent: #2980B9;
+  --highlight: #F1C40F;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.game-clock {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 4rem;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+.player-token {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  cursor: grab;
+  transition: transform 0.1s ease;
+  touch-action: none;
+}
+
+.player-token:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.on-ice {
+  border: 3px solid #FFFFFF;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.bench {
+  background-color: #333333;
+}
+
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 50;
+}
+
+.rink-overlay {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Ice_hockey_rink.svg/1024px-Ice_hockey_rink.svg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.8;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --primary: #00FF00;
+    --destructive: #FF0000;
+  }
+}

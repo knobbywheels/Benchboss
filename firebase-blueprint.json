@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and settings",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Player": {
+      "title": "Player",
+      "description": "A player in the team roster",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "number": { "type": "string" },
+        "position": { "type": "string", "enum": ["F", "D", "G"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "number", "position"]
+    },
+    "Game": {
+      "title": "Game",
+      "description": "A recorded hockey game",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "opponent": { "type": "string" },
+        "location": { "type": "string" },
+        "periodLength": { "type": "number" },
+        "currentPeriod": { "type": "number" },
+        "status": { "type": "string", "enum": ["scheduled", "live", "completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "opponent", "status"]
+    },
+    "Shot": {
+      "title": "Shot",
+      "description": "A shot logged during a game",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "playerId": { "type": "string" },
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "isGoal": { "type": "boolean" },
+        "period": { "type": "number" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "x", "y", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private user profile"
+    },
+    "/users/{userId}/players/{playerId}": {
+      "schema": "Player",
+      "description": "Team roster for the user"
+    },
+    "/users/{userId}/games/{gameId}": {
+      "schema": "Game",
+      "description": "Games managed by the user"
+    },
+    "/users/{userId}/games/{gameId}/shots/{shotId}": {
+      "schema": "Shot",
+      "description": "Shots recorded in a specific game"
+    }
+  }
+}

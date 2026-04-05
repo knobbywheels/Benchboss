@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}
+    // Fields:
+    //   - uid: string (required, immutable)
+    //   - email: string (required, email format)
+    //   - displayName: string (optional)
+    //   - createdAt: string (optional, date-time)
+    //
+    // Collection: /users/{userId}/players/{playerId}
+    // Fields:
+    //   - id: string (required)
+    //   - name: string (required, max 100)
+    //   - number: string (required, max 5)
+    //   - position: string (required, F|D|G)
+    //
+    // Collection: /users/{userId}/games/{gameId}
+    // Fields:
+    //   - id: string (required)
+    //   - opponent: string (required, max 100)
+    //   - location: string (optional)
+    //   - status: string (required, scheduled|live|completed)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function hasOnlyAllowedFields(allowedFields) {
+      return request.resource.data.keys().hasOnly(allowedFields);
+    }
+
+    // User Profile Rules
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.uid == userId &&
+               isValidEmail(data.email) &&
+               (data.displayName == null || (data.displayName is string && data.displayName.size() < 100));
+      }
+
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
+                    request.resource.data.uid == resource.data.uid;
+      allow delete: if false;
+
+      // Players Subcollection
+      match /players/{playerId} {
+        function isValidPlayer(data) {
+          return data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+                 data.number is string && data.number.size() > 0 && data.number.size() < 5 &&
+                 data.position in ['F', 'D', 'G'];
+        }
+
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidPlayer(request.resource.data);
+        allow update: if isOwner(userId) && isValidPlayer(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Games Subcollection
+      match /games/{gameId} {
+        function isValidGame(data) {
+          return data.opponent is string && data.opponent.size() > 0 && data.opponent.size() < 100 &&
+                 data.status in ['scheduled', 'live', 'completed'];
+        }
+
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidGame(request.resource.data);
+        allow update: if isOwner(userId) && isValidGame(request.resource.data);
+        allow delete: if isOwner(userId);
+
+        // Shots Subcollection
+        match /shots/{shotId} {
+          function isValidShot(data) {
+            return data.x is number && data.x >= 0 && data.x <= 100 &&
+                   data.y is number && data.y >= 0 && data.y <= 100 &&
+                   data.timestamp is number;
+          }
+
+          allow read: if isOwner(userId);
+          allow create: if isOwner(userId) && isValidShot(request.resource.data);
+          allow update: if isOwner(userId) && isValidShot(request.resource.data);
+          allow delete: if isOwner(userId);
+        }
+      }
+    }
+  }
+}

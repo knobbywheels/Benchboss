@@ -1,0 +1,5 @@
+{
+  "name": "BenchBoss",
+  "description": "A mobile-first web application for ice hockey coaches to track real-time player statistics and 'Time on Ice' (TOI).",
+  "requestFramePermissions": []
+}
