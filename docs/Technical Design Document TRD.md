@@ -29,3 +29,12 @@ BenchBoss is an offline-first Progressive Web Application (PWA) built for real-t
     "assists_2": 0
   }
 }
+
+{
+  "gameId": "uuid",
+  "timestamp": "ISO-8601",
+  "opponent": "string",
+  "location": "string",
+  "periods": [ { "duration": 900, "status": "complete" } ],
+  "eventLog": [] // Array of Coordinate-mapped events
+}
